@@ -5,46 +5,16 @@
 # Released under GPLv3+ license, see LICENSE.txt
 #
 # Orignally forked from Cork example web application
-#
-# The following users are already available:
-#  admin/admin, demo/demo
 
-import bottle
-from beaker.middleware import SessionMiddleware
-from cork import Cork
-from cork.backends import SQLiteBackend
+import os,sys,traceback as tb,bottle
+
+# #  Logging stuff  # #
 import logging
-
 logging.basicConfig(format='localhost - - [%(asctime)s] %(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
-bottle.debug(True)
 
-def populate_backend():
-    b = SQLiteBackend('example.db', initialize=True)
-    b.connection.executescript("""
-        INSERT INTO users (username, email_addr, desc, role, hash, creation_date) VALUES
-        (
-            'admin',
-            'admin@localhost.local',
-            'admin test user',
-            'admin',
-            'cLzRnzbEwehP6ZzTREh3A4MXJyNo+TV8Hs4//EEbPbiDoo+dmNg22f2RJC282aSwgyWv/O6s3h42qrA6iHx8yfw=',
-            '2012-10-28 20:50:26.286723'
-        );
-        INSERT INTO roles (role, level) VALUES ('special', 200);
-        INSERT INTO roles (role, level) VALUES ('admin', 100);
-        INSERT INTO roles (role, level) VALUES ('editor', 60);
-        INSERT INTO roles (role, level) VALUES ('user', 50);
-    """)
-    return b
-
-import os
-b = populate_backend()
-aaa = Cork(backend=b,
-           email_sender=os.environ['EMAIL_SENDER'],
-           smtp_url=os.environ['SMTP_URL'])
-
-
+# #  Insert session middleware  # #
+from beaker.middleware import SessionMiddleware
 app = bottle.app()
 session_opts = {
     'session.cookie_expires': True,
@@ -60,11 +30,13 @@ app = SessionMiddleware(app, session_opts)
 # #  Bottle methods  # #
 
 def postd():
-    return bottle.request.forms
+    """get POST dict"""
+    return bottle.request.params
 
 
 def post_get(name, default=''):
-    return bottle.request.POST.get(name, default).strip()
+    """get a HTTP param (get or post)"""
+    return bottle.request.params.get(name, default).strip()
 
 
 @bottle.post('/login')
@@ -72,17 +44,26 @@ def login():
     """Authenticate users"""
     username = post_get('username')
     password = post_get('password')
-    aaa.login(username, password, success_redirect='/', fail_redirect='/login')
+    x = aaa.login(username, password, success_redirect='/', fail_redirect='/login')
+    print "LOGIN", x
+
+@bottle.route('/auth/login', method=['GET','POST'])
+def auth_login():
+    """Authenticate users (JSON)"""
+    username = post_get('username')
+    password = post_get('password')
+    ret = aaa.login(username, password)
+    print "RET", ret
+    pass
 
 @bottle.route('/user_is_anonymous')
 def user_is_anonymous():
-    if aaa.user_is_anonymous:
-        return 'True'
-
-    return 'False'
+    """is user anonymous?"""
+    return 'true' if aaa.user_is_anonymous else 'false'
 
 @bottle.route('/logout')
 def logout():
+    """Log out"""
     aaa.logout(success_redirect='/login')
 
 
@@ -91,6 +72,15 @@ def register():
     """Send out registration email"""
     aaa.register(post_get('username'), post_get('password'), post_get('email_address'))
     return 'Please check your mailbox.'
+
+@bottle.route('/auth/register',method=['GET','POST'])
+def auth_register():
+    """Send out registration email (JSON)"""
+    try:
+        aaa.register(post_get('username'), post_get('password'), post_get('email_address'))
+    except:
+        return dict(success=False,errmsg='Access Denied')
+    return dict()
 
 
 @bottle.route('/validate_registration/:registration_code')
@@ -105,8 +95,7 @@ def send_password_reset_email():
     """Send out password reset email"""
     aaa.send_password_reset_email(
         username=post_get('username'),
-        email_addr=post_get('email_address')
-    )
+        email_addr=post_get('email_address'))
     return 'Please check your mailbox.'
 
 
@@ -129,6 +118,17 @@ def index():
     """Only authenticated users can see this"""
     aaa.require(fail_redirect='/login')
     return 'Welcome! <a href="/admin">Admin page</a> <a href="/logout">Logout</a>'
+
+
+@bottle.route('/auth_require',method=['GET','POST'])
+def auth_require():
+    """Only authenticated users can see this"""
+    try:
+        if aaa.require():
+            return dict()
+    except:
+        pass
+    return dict(success=False, errmsg='Access Denied')
 
 
 @bottle.route('/restricted_download')
@@ -157,12 +157,12 @@ def admin():
     return dict(
         current_user=aaa.current_user,
         users=aaa.list_users(),
-        roles=aaa.list_roles()
-    )
+        roles=aaa.list_roles())
 
 
 @bottle.post('/create_user')
 def create_user():
+    """Create user"""
     try:
         aaa.create_user(postd().username, postd().role, postd().password)
         return dict(ok=True, msg='')
@@ -172,6 +172,7 @@ def create_user():
 
 @bottle.post('/delete_user')
 def delete_user():
+    """Delete user"""
     try:
         aaa.delete_user(post_get('username'))
         return dict(ok=True, msg='')
@@ -182,6 +183,7 @@ def delete_user():
 
 @bottle.post('/create_role')
 def create_role():
+    """Create role"""
     try:
         aaa.create_role(post_get('role'), post_get('level'))
         return dict(ok=True, msg='')
@@ -191,6 +193,7 @@ def create_role():
 
 @bottle.post('/delete_role')
 def delete_role():
+    """Delete role"""
     try:
         aaa.delete_role(post_get('role'))
         return dict(ok=True, msg='')
@@ -214,12 +217,15 @@ def sorry_page():
 
 
 # #  Web application main  # #
+def serve():
+    global b
+    global aaa
+    from cork import Cork
+    from cork.backends import SQLiteBackend
+    b = SQLiteBackend(os.environ['DBNAME'], initialize=False)
+    aaa = Cork(backend=b,
+               email_sender=os.environ['EMAIL_SENDER'],
+               smtp_url=os.environ['SMTP_URL'])
+    bottle.run(app=app, quiet=False, reloader=True, debug=True)
 
-def main():
-
-    # Start the Bottle webapp
-    bottle.debug(True)
-    bottle.run(app=app, quiet=False, reloader=False)
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": serve()
