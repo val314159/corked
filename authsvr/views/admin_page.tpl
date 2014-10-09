@@ -42,7 +42,7 @@
         <table>
             <tr><th>Username</th><th>Role</th><th>Email</th><th>Description</th></tr>
             %for u in users:
-            <tr><td>{{u[0]}}</td><td>{{u[1]}}</td><td>{{u[2]}}</td><td>{{u[2]}}</td></tr>
+            <tr><td>{{u[0]}}</td><td>{{u[1]}}</td><td>{{u[2]}}</td><td>{{u[3]}}</td></tr>
             %end
         </table>
         <br/>

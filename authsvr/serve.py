@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2014 Federico Ceratto and others, see AUTHORS file.
+# Copyright (C) 2014 Joel Ward and others, see AUTHORS file.
 # Copyright (C) 2013 Federico Ceratto and others, see AUTHORS file.
 # Released under GPLv3+ license, see LICENSE.txt
 #
@@ -45,16 +45,18 @@ def login():
     username = post_get('username')
     password = post_get('password')
     x = aaa.login(username, password, success_redirect='/', fail_redirect='/login')
-    print "LOGIN", x
 
 @bottle.route('/auth/login', method=['GET','POST'])
 def auth_login():
     """Authenticate users (JSON)"""
     username = post_get('username')
     password = post_get('password')
-    ret = aaa.login(username, password)
-    print "RET", ret
-    pass
+    try:
+        if aaa.login(username, password):
+            return dict()
+    except:
+        pass
+    return dict(success=False, errmsg='Access Denied')
 
 @bottle.route('/user_is_anonymous')
 def user_is_anonymous():
@@ -65,6 +67,11 @@ def user_is_anonymous():
 def logout():
     """Log out"""
     aaa.logout(success_redirect='/login')
+
+@bottle.route('/auth/logout',method=['GET','POST'])
+def auth_logout():
+    """Log out (JSON)"""
+    aaa.logout()
 
 
 @bottle.post('/register')
@@ -79,7 +86,8 @@ def auth_register():
     try:
         aaa.register(post_get('username'), post_get('password'), post_get('email_address'))
     except:
-        return dict(success=False,errmsg='Access Denied')
+        return dict(success=False,errmsg='Registration Failed',
+                    language='python',trace=tb.format_exc().split('\n'))
     return dict()
 
 
