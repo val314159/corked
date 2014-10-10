@@ -1,7 +1,7 @@
-Corky (v0.1)
+Corked (v0.1)
 =========
 
-Corky is an authorization server for cork (bottle/flask)
+Corked is an authorization server for cork (bottle/flask)
 It can use multiple backends. *(default uses sqlite3)*
 
 You can log in directly to the server, or use it thru HTTP calls.
@@ -21,7 +21,7 @@ After you run it,
 
     . env.sh run_other
 
-And proceed to [The Corky Lab](http://localhost:8000/)
+And proceed to [The Corked Lab](http://localhost:8000/)
 
 ------------
 ### FAQ
