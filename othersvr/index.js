@@ -12,7 +12,7 @@ var _offset = 0;
 
 function dd() {
     var d = new Date();
-    return '' + d + '::' + (d.getTime()*1000) + (++offset);
+    return '' + d + '::' + (d.getTime()*1000) + (++_offset);
 }
 
 var _hasOutstandingRequests = false;
