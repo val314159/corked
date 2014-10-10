@@ -22,7 +22,8 @@ After you run it,
 
 1. Why does this exist?
 
- - I needed an authorization server, not a library.  So I took the simple example program and started adding features that I needed.
+ - I needed an authorization server, not a library.  I also didn't want a ton of dependencies (KISS).
+So I took the simple example program and started adding features that I needed.
 
 ------------
 
