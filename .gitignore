@@ -52,3 +52,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# dirs we dont care about
+.v
+*.db
+
+# emacs backups
+\#*\#
+.\#*

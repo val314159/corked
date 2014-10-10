@@ -9,42 +9,52 @@
   </head>
   <body>
     <div data-role="page">
-
-      <div data-role="header">
+      <div data-role="header" data-position="fixed">
 	<h1>Corky Login Lab</h1>
       </div>
 
       <div data-role="main" class="ui-content">
 
-	<div>
-	  Status: <span id="status">Unknown</span>
+	<div class="ui-field-contain">
+	  <label  for="status"  >Status:</label>
+	  <input name="status"  id="status" value="Unknown">
 	</div>
 
 	<div data-role="collapsibleset">
 
 	  <div data-role="collapsible" data-mini="true">
 	    <h4>Log in:</h4>
-	    <li>Username:<input name="username"  id="u1"/></li>
-	    <li>Password:<input name="password"  id="p1" type="password"/></li>
-	    <br/>
-	    <button onclick="login()" class="ui-btn ui-mini">Log In</button>
+	    <div class="ui-field-contain">
+	      <label  for="username"  >Username:</label>
+	      <input name="username"  id="u1" placeholder="Enter username here...">
+	      <label  for="password"  >Password:</label>
+	      <input name="password"  id="p1" type="password" placeholder="type password here...">
+	    </div>
+	    <input type="submit" data-inline="true" value="Log In" onclick="login()">
 	  </div>
 
 	  <div data-role="collapsible" data-mini="true">
 	    <h4>Register New Account:</h4>
-	    <li>Username:<input name="username"  id="u2"/></li>
-	    <li>Email:   <input name="email"     id="e2"/></li>
-	    <li>Password:<input name="password"  id="p2"type="password"/></li>
-	    <br/>
-	    <button onclick="register()" class="ui-btn ui-mini">Register</button>
+	    <div class="ui-field-contain">
+	      <label  for="username"  >Username:</label>
+	      <input name="username"  id="u2" placeholder="Enter username here...">
+	      <label  for="email"     >Email:</label>
+	      <input name="email"     id="e2" placeholder="you@email.com">
+	      <label  for="password"  >Password:</label>
+	      <input name="password"  id="p2"type="password" placeholder="type password here...">
+	    </div>
+	    <input type="submit" data-inline="true" value="Register" onclick="register()">
 	  </div>
 
 	  <div data-role="collapsible" data-mini="true">
 	    <h4>Forgot Password:</h4>
-	    <li>Username:<input name="username"  id="u3"/></li>
-	    <li>Email:   <input name="email"     id="e3"/></li>
-	    <br/>
-	    <button onclick="forgot()" class="ui-btn ui-mini">Send Email</button>
+	    <div class="ui-field-contain">
+	      <label  for="username"  >Username:</label>
+	      <input name="username"  id="u3" placeholder="Enter username here...">
+	      <label  for="email"     >Email:</label>
+	      <input name="email"     id="e3" placeholder="you@email.com">
+	    </div>
+	    <input type="submit" data-inline="true" value="Send Email" onclick="forgot()">
 	  </div>
 
 	</div>
@@ -56,7 +66,7 @@
 	<div id="out"></div>
       </div>
 
-      <div data-role="footer">
+      <div data-role="footer" data-position="fixed">
 	<h1>Footer Text</h1>
       </div>
 

@@ -6,11 +6,14 @@
 #export SMTP_URL='starttls://USERNAME:PASSWORD@smtp.gmail.com:587'
 
 export PYTHONUNBUFFERED=1
+export DBNAME=authsvr.db
 
 run() {
-  (cd authsvr ; python -mserve)
+  (cd authsvr ; python -m serve)
 }
 
-export DBNAME=authsvr.db
+run_other() {
+  (cd othersvr ; python -m SimpleHTTPServer)
+}
 
 $*
