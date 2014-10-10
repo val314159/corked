@@ -29,10 +29,11 @@ def login():
     """Authenticate users"""
     username = param_get('username')
     password = param_get('password')
-    if backend.login(username, password, success_redirect='/', fail_redirect='/login'):
-        print "ACCESS GRANTED"
+    if backend.login(username, password,
+                     success_redirect='/', fail_redirect='/login'):
+        print "IDENT VERIFIED"
     else:
-        print "ACCESS DENIED"
+        print "IDENT UNVERIFIED"
 
 @bottle.route('/auth/login', method=['HEAD','GET','POST','OPTIONS'])
 def auth_login():
@@ -44,11 +45,11 @@ def auth_login():
     password = param_get('password')
     try:
         if backend.login(username, password):
-            print "ACCESS GRANTED"
+            print "IDENT VERIFIED"
             return dict(desc=backend.current_user.description)
     except:
         pass
-    print "ACCESS DENIED"
+    print "IDENT UNVERIFIED"
     return dict(success=False, errmsg='Access Denied')
 
 @bottle.route('/user_is_anonymous')
